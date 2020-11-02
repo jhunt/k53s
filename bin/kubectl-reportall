@@ -1,0 +1,17 @@
+#!/bin/bash
+
+export REPORT=report.$(date -u +%Y%m%dT%H%M%S)
+mkdir -p ${REPORT}
+echo "... getting resource YAMLs from k8s cluster ..."
+kubectl get -A -o yaml $(kubectl api-resources | awk '!/^NAME/ {print $1}' | grep -Ev 'localsubjectaccessreviews|bindings' | xargs echo | sed -e 's/ /,/g') > ${REPORT}/resources.yml
+
+echo "... getting Pod logs from k8s cluster ..."
+kubectl get po -A -o go-template='{{range .items}}mkdir -p $REPORT/logs/{{.metadata.namespace}}
+echo "    + {{.metadata.namespace}}/{{.metadata.name}}"
+kubectl logs --all-containers -n "{{.metadata.namespace}}" "{{.metadata.name}}" > $REPORT/logs/{{.metadata.namespace}}/{{.metadata.name}}.log
+{{end}}' | /bin/sh
+
+echo
+echo "DONE."
+echo "your final report can be found in ${REPORT}/"
+exit 0

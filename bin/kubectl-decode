@@ -1,0 +1,4 @@
+#!/bin/sh
+cred=$1; shift
+kubectl get secret -o template="{{index .data \"$cred\" | base64decode }}" "$@"
+test -t 1 && echo

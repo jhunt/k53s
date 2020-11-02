@@ -1,0 +1,4 @@
+#!/bin/sh
+jb=$1 ; shift
+echo >&2 kubectl exec -it "$jb" /bin/bash ...
+exec kubectl exec -it "$jb" /bin/bash "$@"

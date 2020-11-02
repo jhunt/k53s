@@ -1,0 +1,2 @@
+#!/bin/bash
+exec ssh $(kubectl get nodes -o json | jq -r '.items[0].status.addresses[] | select(.type == "ExternalIP") | .address') "$@"
